@@ -36,15 +36,15 @@ async function main (songname) {
   for(let i of data) {
     if(i.type == "SONG" || i.type == "VIDEO")
     {
-      song = new Song(i.name, i.artist.name, i.thumbnails[0].url, tmp, i.videoId);
-      final.push({
-        type: "article",
-        id: song.id,
-        title: song.name,
-        description: song.artist,
-        thumbnail_url: song.url,
-        message_text: `/start`,
-      });
+      // song = new Song(i.name, i.artist.name, i.thumbnails[0].url, tmp, i.videoId);
+      // final.push({
+      //   type: "article",
+      //   id: song.id,
+      //   title: song.name,
+      //   description: song.artist,
+      //   thumbnail_url: song.url,
+      //   message_text: `/start`,
+      // });
       exported.push(i);
       tmp += 1;
     }
@@ -85,11 +85,21 @@ bot.on("chosen_inline_result", async (ctx) => {
 });
 
 bot.command('download', (ctx) => {
-  let
+  let userMessage = ctx.message.text;
   console.log(ctx.message.text);
-  ctx.reply('chose hui', Markup.inlineKeyboard([Markup.button.callback(ctx.message.text, 'data_a')]))
+
+  ctx.reply('chose hui', Markup.inlineKeyboard([]))
 });
 
 bot.launch(() => {
   console.log('Inline bot is running...');
 });
+
+
+function createArrayOfButtons(songs) {
+  let choices = [];
+  for (let i of songs) {
+    choices.push(Markup.button.callback(`${i.name} by ${i.artist.name}`, i.videoId));
+  }
+  return choices;
+}
