@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "ffmetadata": "^1.7.0",
+    "telegraf": "^4.16.3",
+    "ts-dotenv": "^0.9.1",
+    "ytdlp-nodejs": "^2.3.0",
+    "ytmusic-api": "^5.3.0"
+  },
+  "type": "module",
+  "name": "ytm_dl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-downloader": "node ./downloader.js",
+    "start": "tsc main.ts && node main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.11"
+  }
+}
