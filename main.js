@@ -7,15 +7,9 @@ const token = load({
 	TOKEN: String,
 }).TOKEN;
 
-class Song {
-  constructor(songName, artist, imageUrl, id, videoId) {
-    this.name = songName;
-    this.artist = artist;
-    this.url = imageUrl;
-    this.videoId = videoId;
-    this.id = id;
-  }
-}
+const servUrl = load({
+  URL: String,
+}).URL;
 
 let result = [];
 
@@ -29,7 +23,6 @@ async function main (songname) {
       console.log("ERROR WHILE FETCHING SONG DATA:", err);
     }
   } 
-  // console.log(data);
   let tmp = 0;
   let exported = [];
   let song;
@@ -53,31 +46,6 @@ bot.start((ctx) => {
 	return ctx.reply(`Hello, ${ctx.update.message.from.first_name}`)
 })
 
-bot.on('inline_query', async (ctx) => {
-  try {result = await main(ctx.inlineQuery.query);}
-  catch(err)
-  {
-    if(err)
-    {
-      console.log(err);
-    }
-  }
-  // Answer the inline query
-  await ctx.answerInlineQuery(result[0]);
-});
-
-bot.on("chosen_inline_result", async (ctx) => {
-  const answer = ctx.chosenInlineResult;
-  console.log(`User ${answer.from.username} selected result with ID: ${answer.result_id}\n ${answer.query}`);
-  // console.log(await result[0][Number(answer.result_id)], await result[1], await result[2][Number(answer.result_id)]);
-
-  //THIS SHIT DOESN'T WORK
-  //This shit catches an error when trying to read result[2][Number(answer.result_id)] because this mf is empty??? wtf help (fixed???)
-  //idk i think i fixed it
-  const myData = result[2][Number(answer.result_id)];
-  await downloadEverything(myData, `./img-music-tmp/${myData.title}.mp3`, `./img-music-tmp/Cover_${myData.title}.jpg`, myData.title, myData.artists)
-});
-
 bot.command('download', async (ctx) => {
   let userMessage = ctx.message.text;
   userMessage = userMessage.substring(userMessage.indexOf(" ") + 1);
@@ -95,7 +63,7 @@ bot.on('callback_query', async (ctx) => {
   try{
     await downloadEverything(myData, `./img-music-tmp/${myData.title}.mp3`, `./img-music-tmp/Cover_${myData.title}.jpg`, myData.title, myData.artists).then(() => {
       try{
-        ctx.replyWithAudio(`https://b92uj2.tunnel.pyjam.as/${myData.title}.mp3`);
+        ctx.replyWithAudio(`${servUrl}${myData.title}.mp3`);
       } catch(err) {
         if(err){
           console.log('No file found or http server is not accessible');

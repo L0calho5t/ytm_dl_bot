@@ -1,5 +1,4 @@
 import { YtDlp } from 'ytdlp-nodejs';
-import YTMusic from 'ytmusic-api';
 import YTMusicAPI from "lite-ytmusic-api";
 import * as fs from 'node:fs';
 import * as ffmetadata from 'ffmetadata';
