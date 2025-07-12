@@ -20,8 +20,8 @@
 5. Create `.env` file to hold your BotFather token
 6. Add the following to the file: `TOKEN="<Your token>"`</br> and replace `<Your token>` with token provided by the BotFather in step 2
 7. Go to the *img-music-tmp* folder and run `npx http-server`. If the package is not installed - npx will offer you to install it. Do it.
-8. Go to another terminal session and type </br> ```curl https://tunnel.pyjam.as/8080 > tunnel.conf && wg-quick up ./tunnel.conf ``` to forward yout 8080 port through pyjam servers and to allow connections from external computers. </br> it fill look like this: ![placeholder](pyjam.png)
-9. In `.env` file add URL value and then write the url that pyjam gave you </br> Exaple `.env` file: 
+8. Go to another terminal session and type </br> ```curl https://tunnel.pyjam.as/8080 > tunnel.conf && wg-quick up ./tunnel.conf ``` to forward yout 8080 port through pyjam servers and to allow connections from external computers. </br> Output will look like this: ![placeholder](pyjam.png)
+9. In `.env` file add URL value and then write the url that pyjam gave you </br> Example `.env` file: 
     ```
     TOKEN="example:1234567890abcdefghijklm"
     URL="https://example.tunnel.pyjam.as/"
