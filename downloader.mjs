@@ -1,10 +1,12 @@
 import { YtDlp } from 'ytdlp-nodejs';
 import YTMusic from 'ytmusic-api';
+import YTMusicAPI from "lite-ytmusic-api";
 import * as fs from 'node:fs';
 import * as ffmetadata from 'ffmetadata';
 
 const ytdlp = new YtDlp();
-const ytmusic = new YTMusic();
+// const ytmusic = new YTMusic();
+const ytmusic = new YTMusicAPI();
 
 await ytmusic.initialize();
 
@@ -12,29 +14,36 @@ await ytmusic.initialize();
 
 async function downloadEverything(mySong, filePath, coverPath, songName, songArtist){
   await getImage(mySong, coverPath);
-  await downloadVideo(mySong.videoId, mySong.name).then(() => {
-    // const name = "./" + `${mySong.name} ` + "[" + `${mySong.videoId}` + "]" + ".mp3";
+  await downloadVideo(mySong.videoId, mySong.title).then(() => {
+    // const name = "./" + `${mySong.title} ` + "[" + `${mySong.videoId}` + "]" + ".mp3";
 
     //THIS SHIT DOESN'T WORK
     //It can't rename the file and regex is fucked up (fixed??)
     //Regexp now if fine (probably)
-    const escapeRegex = str => str.replace(/[.*+?^${}()[\]\\]/g, '\\$&');
-    const baseName = mySong.name.replace(/\.mp3$/i, '');
+    const escapeRegex = str => str.replace(/[.*+?^${}()\\]/g, '\\$&');
+    const baseName = mySong.title.replace(/\.mp3$/i, '');
     const namePattern = new RegExp(`.*${escapeRegex(baseName)}.*\\.mp3$`, 'i');
     const files = fs.readdirSync('./');
-    files.forEach(file => {
-      if(namePattern.test(file))
-      {
-        console.log("FOUND FILE");
-        fs.rename(file, filePath, (error) => {
-          if(error) {
-            console.log("Error renaming: ", error);
-          } else {
-            console.log(`File renaming successful, new name is ${mySong.name}.mp3`);
-          }
-        })
+    try{
+      files.forEach(file => {
+        if(namePattern.test(file))
+        {
+          console.log("FOUND FILE");
+          fs.rename(file, filePath, (error) => {
+            if(error) {
+              console.log("Error renaming: ", error);
+            } else {
+              console.log(`File renaming successful, new name is ${mySong.title}.mp3`);
+            }
+          })
+        }
+      })
+    } catch(err) {
+      if(err) {
+        console.log("Error while renaming");
       }
-    })
+    }
+
   }).then(() => {
     addFileMetadata(filePath, coverPath, songName, songArtist);
   });
@@ -42,7 +51,8 @@ async function downloadEverything(mySong, filePath, coverPath, songName, songArt
 
 async function getSongData(sn)
 {
-  return ytmusic.search(sn);
+  await ytmusic.initialize();
+  return await ytmusic.searchSongs(sn);
 }
 
 async function downloadVideo(songId, songname) {
@@ -63,7 +73,7 @@ async function downloadVideo(songId, songname) {
 } 
 
 async function getImage(mySong, coverPath){
-  const url = mySong.thumbnails[mySong.thumbnails.length - 1].url;
+  const url = mySong.thumbnail;
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -73,7 +83,7 @@ async function getImage(mySong, coverPath){
     const buffer = Buffer.from(arrayBuffer);
 
     fs.writeFileSync(coverPath, buffer);
-    console.log(`Image downloaded and saved to: ./img-music-tmp/Cover_${mySong.name}.jpg`);
+    console.log(`Image downloaded and saved to: ./img-music-tmp/Cover_${mySong.title}.jpg`);
   }
   catch (error) {
     console.error(`Error downloading image: ${error}`);

@@ -2,6 +2,7 @@
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "ffmetadata": "^1.7.0",
+    "lite-ytmusic-api": "^1.1.0",
     "telegraf": "^4.16.3",
     "ts-dotenv": "^0.9.1",
     "ytdlp-nodejs": "^2.3.0",

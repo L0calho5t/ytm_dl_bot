@@ -20,7 +20,7 @@ class Song {
 let result = [];
 
 async function main (songname) {
-  let final = [];
+  let choices = [];
   let data = undefined;
   try {
     data = await getSongData(songname);
@@ -33,24 +33,18 @@ async function main (songname) {
   let tmp = 0;
   let exported = [];
   let song;
+  console.log(data);
   for(let i of data) {
     if(i.type == "SONG" || i.type == "VIDEO")
     {
-      // song = new Song(i.name, i.artist.name, i.thumbnails[0].url, tmp, i.videoId);
-      // final.push({
-      //   type: "article",
-      //   id: song.id,
-      //   title: song.name,
-      //   description: song.artist,
-      //   thumbnail_url: song.url,
-      //   message_text: `/start`,
-      // });
+      choices.push([
+        Markup.button.callback(`${i.title} by ${i.artists}`, tmp)
+      ]);
       exported.push(i);
       tmp += 1;
     }
   }
-  console.log('\n---------------------------------------------\n', final, '\n###########################################\n', exported);
-  return [final, song.videoId, exported];
+  return [choices, exported];
 }
 
 const bot = new Telegraf(token);
@@ -81,25 +75,35 @@ bot.on("chosen_inline_result", async (ctx) => {
   //This shit catches an error when trying to read result[2][Number(answer.result_id)] because this mf is empty??? wtf help (fixed???)
   //idk i think i fixed it
   const myData = result[2][Number(answer.result_id)];
-  await downloadEverything(myData, `./img-music-tmp/${myData.name}.mp3`, `./img-music-tmp/Cover_${myData.name}.jpg`, myData.name, myData.artist.name)
+  await downloadEverything(myData, `./img-music-tmp/${myData.title}.mp3`, `./img-music-tmp/Cover_${myData.title}.jpg`, myData.title, myData.artists)
 });
 
-bot.command('download', (ctx) => {
+bot.command('download', async (ctx) => {
   let userMessage = ctx.message.text;
-  console.log(ctx.message.text);
-
-  ctx.reply('chose hui', Markup.inlineKeyboard([]))
+  userMessage = userMessage.substring(userMessage.indexOf(" ") + 1);
+  console.log(userMessage);
+  result = await main(userMessage);
+  console.log(result[0]);
+  ctx.reply("Chose what song you want to download", Markup.inlineKeyboard(result[0]));
 });
+
+bot.on('callback_query', async (ctx) => {
+  const data = ctx.callbackQuery.data;
+  const myData = result[1][data];
+  ctx.deleteMessage(ctx.callbackQuery.message.message_id);
+  ctx.reply(`You chose to download song ${myData.title} by ${myData.artists}`)
+  console.log('\n', data, '\n', myData);
+  try{
+    await downloadEverything(myData, `./img-music-tmp/${myData.title}.mp3`, `./img-music-tmp/Cover_${myData.title}.jpg`, myData.title, myData.artists).then(() => {
+      ctx.replyWithAudio(`https://hmb1te.tunnel.pyjam.as/${myData.title}.mp3`);
+    });
+  } catch (err) {
+    if(err) {
+      console.log("Error when doing something:", err);
+    }     
+  }
+})
 
 bot.launch(() => {
   console.log('Inline bot is running...');
 });
-
-
-function createArrayOfButtons(songs) {
-  let choices = [];
-  for (let i of songs) {
-    choices.push(Markup.button.callback(`${i.name} by ${i.artist.name}`, i.videoId));
-  }
-  return choices;
-}
