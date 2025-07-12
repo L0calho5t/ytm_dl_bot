@@ -15,36 +15,6 @@ await ytmusic.initialize();
 async function downloadEverything(mySong, filePath, coverPath, songName, songArtist){
   await getImage(mySong, coverPath);
   await downloadVideo(mySong.videoId, mySong.title).then(() => {
-    // const name = "./" + `${mySong.title} ` + "[" + `${mySong.videoId}` + "]" + ".mp3";
-
-    //THIS SHIT DOESN'T WORK
-    //It can't rename the file and regex is fucked up (fixed??)
-    //Regexp now if fine (probably)
-    const escapeRegex = str => str.replace(/[.*+?^${}()\\]/g, '\\$&');
-    const baseName = mySong.title.replace(/\.mp3$/i, '');
-    const namePattern = new RegExp(`.*${escapeRegex(baseName)}.*\\.mp3$`, 'i');
-    const files = fs.readdirSync('./');
-    try{
-      files.forEach(file => {
-        if(namePattern.test(file))
-        {
-          console.log("FOUND FILE");
-          fs.rename(file, filePath, (error) => {
-            if(error) {
-              console.log("Error renaming: ", error);
-            } else {
-              console.log(`File renaming successful, new name is ${mySong.title}.mp3`);
-            }
-          })
-        }
-      })
-    } catch(err) {
-      if(err) {
-        console.log("Error while renaming");
-      }
-    }
-
-  }).then(() => {
     addFileMetadata(filePath, coverPath, songName, songArtist);
   });
 }
@@ -57,16 +27,11 @@ async function getSongData(sn)
 
 async function downloadVideo(songId, songname) {
   try {
-    const output = await ytdlp.downloadAsync(
-      `https://music.youtube.com/watch?v=${songId}`,
-      {
-        format: {
-          filter: 'audioonly',
-          type: 'mp3',
-        }
-      }
-    );
-    console.log('Download completed:', songname);
+    await ytdlp.execAsync(`https://music.youtube.com/watch?v=${songId}`, {
+        audioFormat: 'mp3',
+        output: `./img-music-tmp/${songname}.%(ext)s`,
+        extractAudio: true
+    }).then(console.log('Download completed:', songname));
   } catch (error) {
     console.error('Error while trying to download video');
   }

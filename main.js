@@ -83,7 +83,6 @@ bot.command('download', async (ctx) => {
   userMessage = userMessage.substring(userMessage.indexOf(" ") + 1);
   console.log(userMessage);
   result = await main(userMessage);
-  console.log(result[0]);
   ctx.reply("Chose what song you want to download", Markup.inlineKeyboard(result[0]));
 });
 
@@ -95,7 +94,17 @@ bot.on('callback_query', async (ctx) => {
   console.log('\n', data, '\n', myData);
   try{
     await downloadEverything(myData, `./img-music-tmp/${myData.title}.mp3`, `./img-music-tmp/Cover_${myData.title}.jpg`, myData.title, myData.artists).then(() => {
-      ctx.replyWithAudio(`https://hmb1te.tunnel.pyjam.as/${myData.title}.mp3`);
+      try{
+        ctx.replyWithAudio(`https://b92uj2.tunnel.pyjam.as/${myData.title}.mp3`);
+      } catch(err) {
+        if(err){
+          console.log('No file found or http server is not accessible');
+          ctx.reply("Something went wrong on my side.\
+                    Sorry for inconvenience.\
+                    I'm most likely already working on it.\
+                    If the error persists, text me on @linux_ussr");
+        }
+      }
     });
   } catch (err) {
     if(err) {
